@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musikot Purbadhar Project Record</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h2 class="text-center">Project Entry Form</h2>
+    <form id="projectForm" class="p-4 bg-white shadow rounded">
+        <div class="mb-3">
+            <label for="projectName" class="form-label">Project Name</label>
+            <input type="text" class="form-control" id="projectName" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="projectType" class="form-label">Project Type</label>
+            <select class="form-select" id="projectType" required>
+                <option value="">Select Project Type</option>
+                <option value="Water Supply">Water Supply</option>
+                <option value="Road">Road</option>
+                <option value="Building">Building</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="estimatedAmount" class="form-label">Estimated Amount (in NPR)</label>
+            <input type="number" class="form-control" id="estimatedAmount" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="contractDate" class="form-label">Contract Date</label>
+            <input type="date" class="form-control" id="contractDate" required>
+        </div>
+
+        <div class="mb-3 d-none" id="roadLengthField">
+            <label for="roadLength" class="form-label">Road Length (in km)</label>
+            <input type="number" class="form-control" id="roadLength">
+        </div>
+
+        <div class="mb-3">
+            <label for="fileUpload" class="form-label">Upload File</label>
+            <input type="file" class="form-control" id="fileUpload">
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Submit</button>
+    </form>
+</div>
+
+<script>
+document.getElementById("projectType").addEventListener("change", function() {
+    const roadField = document.getElementById("roadLengthField");
+    if (this.value === "Road") {
+        roadField.classList.remove("d-none");
+    } else {
+        roadField.classList.add("d-none");
+    }
+});
+
+document.getElementById("projectForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent page reload
+
+    // Collect form data
+    const projectName = document.getElementById("projectName").value;
+    const projectType = document.getElementById("projectType").value;
+    const estimatedAmount = document.getElementById("estimatedAmount").value;
+    const contractDate = document.getElementById("contractDate").value;
+    const roadLength = document.getElementById("roadLength").value || "N/A";
+    const file = document.getElementById("fileUpload").files[0];
+
+    if (!projectName || !projectType || !estimatedAmount || !contractDate) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
+    // Prepare data to send
+    let formData = new FormData();
+    formData.append("projectName", projectName);
+    formData.append("projectType", projectType);
+    formData.append("estimatedAmount", estimatedAmount);
+    formData.append("contractDate", contractDate);
+    formData.append("roadLength", roadLength);
+
+    // Send data to Google Apps Script (new URL)
+    fetch("https://script.google.com/macros/s/AKfycbxva71Zr9CtZ6clVaC4MxJpEKPwle6WKs_FHEZivs0EjHnUlM0WgMpCKta_J9LmkGdSyQ/exec", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert("Project data submitted successfully!");
+        document.getElementById("projectForm").reset(); // Clear form
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error submitting data. Please try again.");
+    });
+});
+</script>
+
+</body>
+</html>
